@@ -28,6 +28,10 @@ npm run dev
 cd server
 npm install
 ```
+默认地址：`http://localhost:5173`
+
+## 后端启动（server/）
+> 需要 Node.js 18+（后端使用原生 `fetch` 调用 Gemini HTTP API，无需安装 `@google/genai`）。
 
 ### 2) 配置环境变量
 复制 `server/.env.example` 为 `server/.env` 并填写：
