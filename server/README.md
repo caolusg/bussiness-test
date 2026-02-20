@@ -2,8 +2,6 @@
 
 Express + PostgreSQL 后端服务，提供认证、会话与聊天 API。
 
-> 运行要求：Node.js 18+（使用内置 `fetch` 直连 Google Generative Language API）。
-
 ## 1. 环境变量
 复制 `server/.env.example` 到 `server/.env` 并填写：
 
@@ -13,7 +11,7 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/negotiateai
 JWT_SECRET=replace_with_a_long_random_secret
 FRONTEND_URL=http://localhost:5173
 GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MODEL=gemini-2.0-flash
 ```
 
 ## 2. 安装与启动

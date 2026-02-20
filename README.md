@@ -23,13 +23,15 @@ npm run dev
 默认地址：`http://localhost:5173`
 
 ## 后端启动（server/）
-> 需要 Node.js 18+（后端使用原生 `fetch` 调用 Gemini HTTP API，无需安装 `@google/genai`）。
-
 ### 1) 安装依赖
 ```bash
 cd server
 npm install
 ```
+默认地址：`http://localhost:5173`
+
+## 后端启动（server/）
+> 需要 Node.js 18+（后端使用原生 `fetch` 调用 Gemini HTTP API，无需安装 `@google/genai`）。
 
 ### 2) 配置环境变量
 复制 `server/.env.example` 为 `server/.env` 并填写：
@@ -39,7 +41,7 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/negotiateai
 JWT_SECRET=replace_with_a_long_random_secret
 FRONTEND_URL=http://localhost:5173
 GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MODEL=gemini-2.0-flash
 ```
 
 ### 3) 执行数据库迁移

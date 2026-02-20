@@ -1,15 +1,20 @@
 import { Router } from 'express';
+import { GoogleGenAI } from '@google/genai';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 import { AuthedRequest, requireAuth } from '../auth.js';
 import { pool } from '../db.js';
 import { buildChatPrompt } from '../prompt.js';
-import { generateText } from '../services/gemini.js';
 
 const chatSchema = z.object({
   sessionId: z.string().uuid(),
   userMessage: z.string().min(1).max(4000),
 });
+
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+const geminiClient = GEMINI_API_KEY ? new GoogleGenAI({ apiKey: GEMINI_API_KEY }) : null;
 
 export const chatRouter = Router();
 
@@ -23,6 +28,15 @@ chatRouter.post('/', async (req, res) => {
       error: {
         code: 'VALIDATION_ERROR',
         message: 'Invalid chat payload',
+      },
+    });
+  }
+
+  if (!geminiClient) {
+    return res.status(500).json({
+      error: {
+        code: 'CONFIG_ERROR',
+        message: 'GEMINI_API_KEY is not configured',
       },
     });
   }
@@ -57,7 +71,7 @@ chatRouter.post('/', async (req, res) => {
     );
 
     const history = historyRes.rows.reverse();
-    const promptText = buildChatPrompt(session.scenario, history, userMessage);
+    const prompt = buildChatPrompt(session.scenario, history, userMessage);
 
     await pool.query('insert into messages (id, session_id, role, content) values ($1, $2, $3, $4)', [
       uuidv4(),
@@ -66,7 +80,12 @@ chatRouter.post('/', async (req, res) => {
       userMessage,
     ]);
 
-    const assistantMessage = await generateText(promptText);
+    const result = await geminiClient.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: prompt,
+    });
+
+    const assistantMessage = result.text?.trim();
 
     if (!assistantMessage) {
       return res.status(502).json({
@@ -86,14 +105,11 @@ chatRouter.post('/', async (req, res) => {
 
     return res.json({ assistantMessage });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to process chat';
-    const code = message.includes('GEMINI_API_KEY is not configured') ? 'CONFIG_ERROR' : 'INTERNAL_ERROR';
-
     console.error('chat error', error);
     return res.status(500).json({
       error: {
-        code,
-        message: code === 'CONFIG_ERROR' ? 'GEMINI_API_KEY is not configured' : 'Failed to process chat',
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to process chat',
       },
     });
   }
