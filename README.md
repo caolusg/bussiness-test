@@ -1,48 +1,68 @@
-# NegotiateAI - 商务谈判训练平台 (纯前端)
+# NegotiateAI - 商务谈判训练平台
 
-这是一个基于 AI 的商务谈判实战训练平台前端项目。
+该仓库是前后端同仓库项目：
+- 前端：Vite + React + TypeScript（根目录）
+- 后端：Express + PostgreSQL + JWT + Gemini（`server/`）
 
-## 技术栈
-- **框架**: React 19 + TypeScript
-- **构建工具**: Vite
-- **样式**: Tailwind CSS 4
-- **动画**: Framer Motion (motion/react)
-- **路由**: React Router 7
-- **图标**: Lucide React
-
-## 快速开始
-
-### 1. 安装依赖
+## 前端启动（根目录）
+1) 安装依赖
 ```bash
-rm -rf node_modules && npm install
+npm install
 ```
 
-### 2. 配置环境变量
-在项目根目录创建 `.env` 文件（或修改 `.env.example`）:
+2) 配置前端环境变量（根目录）
+- 复制 `.env.example` 为 `.env` 并按需修改：
+```bash
+cp .env.example .env
+```
+- 至少确保：
 ```env
 VITE_API_BASE_URL=http://localhost:3000
 ```
-*注意：后端未启动时，API 调用失败属于正常现象。*
 
-### 3. 启动开发服务器
+3) 启动前端
 ```bash
 npm run dev
 ```
+访问：`http://localhost:5173`
 
-## 功能模块
-- **身份认证**: 登录、注册（带表单校验，Token 自动管理）。
-- **会话管理**: 浏览历史会话、新建谈判会话。
-- **场景选择**: 提供预设的谈判场景模板。
-- **实战对话**: 沉浸式聊天 UI，支持实时消息发送。
+## 后端启动（server/）
+> 需要 Node.js 18+（使用内置 `fetch` 调用 Gemini HTTP API，后端无需安装 `@google/genai`）。
 
-## API 规范
-项目已封装 `apiClient`，会自动处理：
-1. `Authorization: Bearer <token>` 请求头注入。
-2. 401 Unauthorized 自动跳转登录页。
-3. 使用 `VITE_API_BASE_URL` 作为基地址。
+1) 安装依赖
+```bash
+cd server
+npm install
+```
 
-## 关键路由
-- `/register`: 注册
-- `/login`: 登录
-- `/app`: 会话列表
-- `/app/session/:id`: 谈判对话页
+2) 配置后端环境变量（`server/.env`）
+```env
+PORT=3000
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/negotiateai
+JWT_SECRET=replace_with_a_long_random_secret
+FRONTEND_URL=http://localhost:5173
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-1.5-flash
+```
+
+3) 执行迁移
+```bash
+cd server
+psql "$DATABASE_URL" -f migrations/001_init.sql
+```
+
+4) 启动后端
+```bash
+cd server
+npm run dev
+```
+访问：`http://localhost:3000`
+
+## 最小联调顺序
+1. 注册
+2. 登录拿 token
+3. 创建 session
+4. 调用 chat
+5. 拉取 messages
+
+详细 `curl` 示例见：`server/README.md`。
