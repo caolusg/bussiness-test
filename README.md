@@ -1,9 +1,6 @@
 # NegotiateAI - 商务谈判训练平台
 
-该仓库是前后端同仓库：根目录为前端，`server/` 为后端。
-
-- 前端：Vite + React + TypeScript（根目录）
-- 后端：Express + PostgreSQL + JWT + Gemini（`server/`）
+前后端同仓库：根目录为前端，`server/` 为后端。
 
 ## 前端启动（根目录）
 1) 安装依赖
@@ -11,10 +8,7 @@
 npm install
 ```
 
-2) 配置前端环境变量（根目录）
-```bash
-cp .env.example .env
-```
+2) 配置前端环境变量（根目录 `.env`）
 ```env
 VITE_API_BASE_URL=http://localhost:3000
 ```
@@ -56,12 +50,3 @@ cd server
 npm run dev
 ```
 访问：`http://localhost:3000`
-
-## 最小联调顺序
-1. 注册
-2. 登录拿 token
-3. 创建 session
-4. 调用 chat
-5. 拉取 messages
-
-`curl` 示例见：`server/README.md`。
